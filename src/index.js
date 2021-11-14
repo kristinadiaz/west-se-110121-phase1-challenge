@@ -1,38 +1,56 @@
 const imgUrl = 'http://localhost:3000/images/1';
+const commentList = document.getElementById('comments-list');
 
-// GET request to server
 fetch(imgUrl)
-.then(res => res.json())
-.then(flataPage)
+.then((res) => res.json())
+.then((json) => {
+    imageData = json;
+    renderImage(imageData)
+});
 
-// Render image on page
-function flataPage(picture) {
-    const imageGram = document.querySelector('.image-container');
+document
+.getElementById('like-button')
+.addEventListener('click', incrementLikes)
 
-    const pic = document.querySelector('.title');
-    pic.textContent = picture.title;
-    
-    const img = document.querySelector('#card-image');
-    img.src = picture.image;
-    img.alt = picture.title;  
+document
+.getElementById('comment-form')
+.addEventListener('submit', addComment)
+
+function renderImage(image) {
+    const title = document.getElementById('card-title');
+    title.textContent = image.title;
+
+    document.getElementById('card-image').src = image.image;
+    document.getElementById('card-image').alt = image.title;
+
+    renderLikes(image.likes);
+    renderComments(image.comments);
 };
 
-// add comments to ul#comments-list, will need to remove existing list
-    // iterate through the comments array .forEach()?
+function incrementLikes() {
+    imageData.likes += 1;
+    renderLikes(imageData.likes);
+}
 
-// Event listener to click like button, it will increase the likes by 1
-   // Will need to target picture.likes
-const button = document.querySelector('#like-button');
-button.addEventListener('click', e => {
-    e.preventDefault();
+function renderLikes(likes) {
+    document.getElementById('like-count').textContent = `${likes} likes`;
+}
 
-    console.log(e.target['like-button'])
-});
+function addComment(event) {
+    event.preventDefault();
+    const commentText = event.target.comment.value;
 
-// Event listener to submit a new comment
-const newComment = document.querySelector('#comment-form');
-newComment.addEventListener('submit', e => {
-    e.preventDefault();
+    renderComment( {content:commentText} );
+    event.target.reset();
+}
 
-    console.log(e.target['comment-button'])
-});
+function renderComments(comments) {
+    commentList.innerHTML = ' ';
+    comments.forEach(renderComment);
+};
+
+function renderComment(comment) {
+    const li = document.createElement('li');
+    li.textContent = comment.content;
+    commentList.append(li);
+};
